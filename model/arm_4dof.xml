@@ -1,0 +1,60 @@
+<mujoco model="arm_4dof_sketch">
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <visual>
+    <headlight ambient="0.4 0.4 0.4" diffuse="0.8 0.8 0.8"/>
+    <scale framewidth="0.004" framelength="0.08"/>
+  </visual>
+
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1"/>
+    <!-- Black Ground -->
+    <geom name="floor" type="plane" size="1 1 0.1" rgba="0.12 0.12 0.14 1"/>
+
+    <!-- Target marker -->
+    <body name="target" mocap="true" pos="0.22 0.0 0.22">
+      <geom type="sphere" size="0.015" rgba="1 0.8 0.1 0.9" contype="0" conaffinity="0"/>
+      <site name="target_frame" size="0.004"/>
+    </body>
+
+    <!-- Joint 1 (theta1): Base Yaw at Ground (0, 0, 0) -->
+    <body name="base_yaw" pos="0 0 0">
+      <joint name="theta1" type="hinge" axis="0 0 1" range="-180 180" damping="0.5"/>
+      <geom type="cylinder" size="0.04 0.01" pos="0 0 0.01" rgba="0.3 0.3 0.35 1"/>
+      <site name="theta1_frame" size="0.004"/>
+
+      <!-- Joint 2 (theta2): Shoulder Pitch at Ground + Cyan/Blue Link (L1 = 0.20m) -->
+      <!-- At q2 = 0, link points straight up (+Z). Tilting forward (+X) increases q2 -->
+      <body name="link1_blue" pos="0 0 0">
+        <joint name="theta2" type="hinge" axis="0 1 0" range="-85 85" damping="0.5"/>
+        <geom type="cylinder" fromto="0 -0.04 0 0 0.04 0" size="0.004" rgba="0.2 1 0.3 1" contype="0" conaffinity="0"/>
+        <geom type="capsule" fromto="0 0 0 0 0 0.20" size="0.018" rgba="0.0 0.85 0.95 1"/>
+        <site name="theta2_frame" size="0.004"/>
+
+        <!-- Joint 3 (theta3): Elbow Pitch + Pink Link (L2 = 0.20m) -->
+        <body name="link2_pink" pos="0 0 0.20">
+          <joint name="theta3" type="hinge" axis="0 1 0" range="-150 150" damping="0.5"/>
+          <geom type="cylinder" fromto="0 -0.04 0 0 0.04 0" size="0.004" rgba="0.2 1 0.3 1" contype="0" conaffinity="0"/>
+          <geom type="capsule" fromto="0 0 0 0 0 0.20" size="0.016" rgba="1.0 0.15 0.85 1"/>
+          <site name="theta3_frame" size="0.004"/>
+
+          <!-- Joint 4 (theta4): Wrist Pitch + Red Link (L3 = 0.10m) -->
+          <body name="link3_red" pos="0 0 0.20">
+            <joint name="theta4" type="hinge" axis="0 1 0" range="-200 200" damping="0.3"/>
+            <geom type="cylinder" fromto="0 -0.035 0 0 0.035 0" size="0.004" rgba="0.2 1 0.3 1" contype="0" conaffinity="0"/>
+            <geom type="capsule" fromto="0 0 0 0 0 0.10" size="0.013" rgba="0.95 0.15 0.15 1"/>
+            <site name="theta4_frame" size="0.004"/>
+            <site name="ee_site" pos="0 0 0.10" size="0.006" rgba="1 1 0 1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="servo_1" joint="theta1" kp="50" forcerange="-15 15"/>
+    <position name="servo_2" joint="theta2" kp="50" forcerange="-15 15"/>
+    <position name="servo_3" joint="theta3" kp="50" forcerange="-15 15"/>
+    <position name="servo_4" joint="theta4" kp="35" forcerange="-8 8"/>
+  </actuator>
+</mujoco>
